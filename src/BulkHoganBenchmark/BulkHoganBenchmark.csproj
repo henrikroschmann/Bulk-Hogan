@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\EfficientBulkOperations\EfficientBulkOperations.csproj" />
+    <ProjectReference Include="..\BulkHogan\BulkHogan.csproj" />
   </ItemGroup>
 
 </Project>

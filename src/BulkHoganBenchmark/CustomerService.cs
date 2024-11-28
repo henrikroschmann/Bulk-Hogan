@@ -1,6 +1,7 @@
-﻿using EfficientBulkOperations;
+﻿using BulkHogan;
+using BulkHogan.Extensions;
 
-namespace EfficientBulkOperationsBenchmark;
+namespace BulkHoganBenchmark;
 
 internal class CustomerService(ApplicationDbContext dbContext)
 {

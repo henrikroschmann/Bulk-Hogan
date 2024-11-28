@@ -1,22 +1,34 @@
+using System.Data;
+using BulkHogan.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Storage;
 using Npgsql;
-using System.Data;
-using System.Linq.Expressions;
-using System.Text;
 
-namespace EfficientBulkOperations;
+namespace BulkHogan;
 
 public static class BulkOperations
 {
-    public static async Task BulkInsertToTempTableAsync<T>(
-    this DbContext context,
-    IEnumerable<T> entities,
-    string tempTableName,
-    BulkOptions<T>? options = null)
+    public static async Task ExecuteBulkOperationAsync<T>(
+         this DbContext context,
+         IEnumerable<T> entities,
+         BulkOptions<T>? options = null)
+    {
+        string tempTable = $"temp_{Guid.NewGuid():N}";
+        await using IDbContextTransaction transaction = await context.Database.BeginTransactionAsync();
+        await context.BulkInsertToTempTableAsync(entities, tempTable, options);
+        await context.MergeTempTableAsync(tempTable, options);
+        await transaction.CommitAsync();
+    }
+
+    private static async Task BulkInsertToTempTableAsync<T>(
+        this DbContext context,
+        IEnumerable<T> entities,
+        string tempTableName,
+        BulkOptions<T>? options = null)
     {
         options ??= new BulkOptions<T>();
-        
+
         // Open connection and keep it open
         var connection = (NpgsqlConnection)context.Database.GetDbConnection();
         var connectionOpenedHere = false;
@@ -43,7 +55,7 @@ public static class BulkOperations
             string alterTempTableSql = $@"ALTER TABLE {tempTableName} ALTER COLUMN ""Id"" DROP IDENTITY;";
 
             // Execute both commands
-            await using var cmd = connection.CreateCommand();
+            await using NpgsqlCommand cmd = connection.CreateCommand();
 
             cmd.CommandText = createTempTableSql;
             await cmd.ExecuteNonQueryAsync();
@@ -73,7 +85,7 @@ public static class BulkOperations
                 await writer.CompleteAsync();
             }
 
-            await using var countCmd = connection.CreateCommand();
+            await using NpgsqlCommand countCmd = connection.CreateCommand();
             countCmd.CommandText = $"SELECT COUNT(*) FROM \"{tempTableName}\";";
             var count = (long)await countCmd.ExecuteScalarAsync();
             Console.WriteLine($"Number of rows inserted into temp table: {count}");
@@ -87,10 +99,10 @@ public static class BulkOperations
         }
     }
 
-    public static async Task MergeTempTableAsync<T>(
-    this DbContext context,
-    string tempTableName,
-    BulkOptions<T> options = null)
+    private static async Task MergeTempTableAsync<T>(
+        this DbContext context,
+        string tempTableName,
+        BulkOptions<T>? options = null)
     {
         options ??= new BulkOptions<T>();
         var entityType = context.Model.FindEntityType(typeof(T));
@@ -124,7 +136,7 @@ public static class BulkOperations
 
             if (options.MergeCondition != null)
             {
-                conditionSql = ConvertExpressionToSql(options.MergeCondition);
+                conditionSql = options.MergeCondition.ConvertConditionToSQL();
             }
 
             conflictClause = $@"
@@ -166,104 +178,5 @@ public static class BulkOperations
             Console.WriteLine($"Error during merge operation: {ex.Message}");
             throw;
         }
-    }
-
-    private static string ConvertExpressionToSql<T>(Expression<Func<T, T, bool>> expression)
-    {
-        var visitor = new MergeConditionVisitor();
-        visitor.Visit(expression);
-        return visitor.Condition;
-    }
-
-    public class MergeConditionVisitor : ExpressionVisitor
-    {
-        private StringBuilder _sb = new StringBuilder();
-        public string Condition => _sb.ToString();
-
-        protected override Expression VisitBinary(BinaryExpression node)
-        {
-            _sb.Append('(');
-            Visit(node.Left);
-
-            switch (node.NodeType)
-            {
-                case ExpressionType.Equal:
-                    _sb.Append(" = ");
-                    break;
-
-                case ExpressionType.NotEqual:
-                    _sb.Append(" <> ");
-                    break;
-
-                case ExpressionType.GreaterThan:
-                    _sb.Append(" > ");
-                    break;
-
-                case ExpressionType.GreaterThanOrEqual:
-                    _sb.Append(" >= ");
-                    break;
-
-                case ExpressionType.LessThan:
-                    _sb.Append(" < ");
-                    break;
-
-                case ExpressionType.LessThanOrEqual:
-                    _sb.Append(" <= ");
-                    break;
-
-                case ExpressionType.AndAlso:
-                    _sb.Append(" AND ");
-                    break;
-
-                case ExpressionType.OrElse:
-                    _sb.Append(" OR ");
-                    break;
-
-                default:
-                    throw new NotSupportedException($"Operation '{node.NodeType}' is not supported");
-            }
-
-            Visit(node.Right);
-            _sb.Append(")");
-            return node;
-        }
-
-        protected override Expression VisitMember(MemberExpression node)
-        {
-            if (node.Expression is ParameterExpression parameter)
-            {
-                string alias = parameter.Name == "existing" ? "target" : "EXCLUDED";
-                _sb.Append($"{alias}.\"{node.Member.Name}\"");
-                return node;
-            }
-
-            throw new NotSupportedException($"The member '{node.Member.Name}' is not supported");
-        }
-
-        protected override Expression VisitConstant(ConstantExpression node)
-        {
-            // Handle constants directly in SQL. Be cautious with SQL injection risks.
-            if (node.Type == typeof(string))
-            {
-                _sb.Append($"'{node.Value}'");
-            }
-            else
-            {
-                _sb.Append(node.Value);
-            }
-            return node;
-        }
-    }
-
-    public static async Task ExecuteBulkOperationAsync<T>(
-    this DbContext context,
-    IEnumerable<T> entities,
-    BulkOptions<T> options = null)
-    {
-        var tempTable = $"temp_{Guid.NewGuid():N}";
-        await using var transaction = await context.Database.BeginTransactionAsync();
-        await context.BulkInsertToTempTableAsync(entities, tempTable, options);
-        await context.MergeTempTableAsync<T>(tempTable, options);
-        await transaction.CommitAsync();
     }
 }

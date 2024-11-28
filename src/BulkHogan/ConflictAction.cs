@@ -1,4 +1,4 @@
-﻿namespace EfficientBulkOperations;
+﻿namespace BulkHogan;
 
 public enum ConflictAction
 {

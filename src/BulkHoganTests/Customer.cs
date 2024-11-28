@@ -1,4 +1,4 @@
-﻿namespace EfficientBulkOperationsTests;
+﻿namespace BulkHoganTests;
 
 public class Customer
 {

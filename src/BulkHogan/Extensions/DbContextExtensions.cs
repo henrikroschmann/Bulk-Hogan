@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace EfficientBulkOperations;
+namespace BulkHogan.Extensions;
 
 public static class DbContextExtensions
 {

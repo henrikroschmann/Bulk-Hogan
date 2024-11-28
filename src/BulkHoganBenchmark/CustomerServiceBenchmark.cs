@@ -3,7 +3,7 @@ using AutoFixture;
 using Microsoft.EntityFrameworkCore;
 using Testcontainers.PostgreSql;
 
-namespace EfficientBulkOperationsBenchmark;
+namespace BulkHoganBenchmark;
 
 [MemoryDiagnoser]
 public class CustomerServiceBenchmark : IDisposable
@@ -78,8 +78,8 @@ public class CustomerServiceBenchmark : IDisposable
     [Benchmark]
     public async Task InsertCustomesInBulkOperationWithConditionAsync()
     {
-        
+
         await _customerService.CreateRangeInBulkWithConditionAsync(Customers);
-        
+
     }
 }

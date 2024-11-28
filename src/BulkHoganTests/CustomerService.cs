@@ -1,6 +1,8 @@
-﻿using EfficientBulkOperations;
+﻿
+using BulkHogan;
+using BulkHogan.Extensions;
 
-namespace EfficientBulkOperationsTests;
+namespace BulkHoganTests;
 
 internal sealed class CustomerService(ApplicationDbContext dbContext)
 {
@@ -17,14 +19,14 @@ internal sealed class CustomerService(ApplicationDbContext dbContext)
         await _dbContext.SaveChangesAsync();
     }
 
-    public async Task CreateInBuld(List<Customer> customers)
+    public async Task CreateInBuild(List<Customer> customers)
     {
         //var options = new BulkOptions<Customer>
         //{
         //    Transaction = _dbContext.Database.BeginTransaction(),
         //};
         await _dbContext.BulkInsertAsync(customers);
-       
+
     }
 
     internal async Task CreateInBuldWithCondition(List<Customer> customers)

@@ -1,11 +1,10 @@
-using Microsoft.EntityFrameworkCore.Storage;
 using System.Linq.Expressions;
 
-namespace EfficientBulkOperations;
+namespace BulkHogan;
 
 public class BulkOptions<T>
 {
     public Expression<Func<T, T, bool>> MergeCondition { get; set; }
-    public int? BatchSize { get; set; }
+    // Maybe add treshhold? 
     public ConflictAction OnConflict { get; set; } = ConflictAction.DoUpdate;
 }

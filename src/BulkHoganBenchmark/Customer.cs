@@ -1,4 +1,4 @@
-﻿namespace EfficientBulkOperationsBenchmark;
+﻿namespace BulkHoganBenchmark;
 
 public class Customer
 {

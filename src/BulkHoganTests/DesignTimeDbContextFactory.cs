@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore;
 
-namespace EfficientBulkOperationsTests;
+namespace BulkHoganTests;
 
 internal class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<ApplicationDbContext>
 {

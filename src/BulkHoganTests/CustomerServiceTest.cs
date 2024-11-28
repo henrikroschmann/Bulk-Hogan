@@ -1,8 +1,9 @@
 ﻿using AutoFixture;
+using EfficientBulkOperationsTests;
 using Microsoft.EntityFrameworkCore;
 using Testcontainers.PostgreSql;
 
-namespace EfficientBulkOperationsTests;
+namespace BulkHoganTests;
 
 public sealed class CustomerServiceTest : IAsyncLifetime
 {
@@ -53,7 +54,7 @@ public sealed class CustomerServiceTest : IAsyncLifetime
 
         // When
         var customers = _fixture.CreateMany<Customer>(10000).ToList();
-        await customerService.CreateInBuld(customers);
+        await customerService.CreateInBuild(customers);
         var customersList = customerService.GetCustomers();
 
         // Then

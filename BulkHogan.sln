@@ -5,11 +5,19 @@ VisualStudioVersion = 17.5.002.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{9B6235DE-891E-4F17-8033-9254B25C2495}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EfficientBulkOperations", "src\EfficientBulkOperations\EfficientBulkOperations.csproj", "{52FBF081-F6E4-4282-B055-360A2D1274C2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BulkHogan", "src\BulkHogan\BulkHogan.csproj", "{52FBF081-F6E4-4282-B055-360A2D1274C2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EfficientBulkOperationsTests", "src\EfficientBulkOperationsTests\EfficientBulkOperationsTests.csproj", "{166BA595-0FA1-423C-8C94-161B40629B56}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BulkHoganTests", "src\BulkHoganTests\BulkHoganTests.csproj", "{166BA595-0FA1-423C-8C94-161B40629B56}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EfficientBulkOperationsBenchmark", "src\EfficientBulkOperationsBenchmark\EfficientBulkOperationsBenchmark.csproj", "{8BF21D4D-ABB6-4F7E-8995-E7753384AEFE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BulkHoganBenchmark", "src\BulkHoganBenchmark\BulkHoganBenchmark.csproj", "{8BF21D4D-ABB6-4F7E-8995-E7753384AEFE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{8A22D2A8-3E04-4F0B-A034-BB7D407DF6CE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Config", "Config", "{4DAD141A-AC61-44B6-B478-00EBC20CB3B2}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		Directory.Build.props = Directory.Build.props
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

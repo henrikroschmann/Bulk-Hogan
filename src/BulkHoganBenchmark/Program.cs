@@ -1,4 +1,4 @@
 ﻿using BenchmarkDotNet.Running;
-using EfficientBulkOperationsBenchmark;
+using BulkHoganBenchmark;
 
 var summary = BenchmarkRunner.Run<CustomerServiceBenchmark>();
